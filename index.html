@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MedMeet - פלטפורמת פגישות רפואיות ב-VR ו-AR</title>
+  <link rel="icon" type="image/png" href="images/logo.png">
+  <!-- טעינת פונט Heebo המקצועי מהפוסטר -->
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+
+  <style>
+    /* ── עיצוב בסיסי ומשתני צבע מהפוסטר ── */
+    :root {
+      --primary-gradient: linear-gradient(135deg, #1e5068 0%, #145060 60%, #0e3a50 100%);
+      --bg-gradient: linear-gradient(160deg, #e2eef2 0%, #d4e6ec 40%, #cce0e8 100%);
+      --text-main: #1a3a48;
+      --accent-blue: #2e7090;
+      --accent-light: #4a8fa8;
+      --card-bg: rgba(255, 255, 255, 0.65);
+      --border-color: rgba(46, 112, 144, 0.2);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth; /* גלילה חלקה בלחיצה על התפריט */
+    }
+
+    body {
+      font-family: 'Heebo', sans-serif;
+      background: #b8cdd4;
+      background-image: var(--bg-gradient);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* קווי רשת עדינים ברקע כמו בפוסטר */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(46, 112, 144, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(46, 112, 144, 0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── מערכת אייקונים אחידה (מונוכרום, יורש את צבע הטקסט) ── */
+    .icon {
+      width: 1em;
+      height: 1em;
+      display: inline-block;
+      vertical-align: -0.14em;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    /* ── תפריט ניווט עליון קבוע ── */
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #1e5068 0%, #145060 100%);
+      box-shadow: 0 4px 20px rgba(20, 70, 100, 0.25);
+      z-index: 1000;
+      border-bottom: 2px solid rgba(140, 180, 190, 0.3);
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 70px;
+    }
+
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-placeholder {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.92);
+      border: 2px solid #b8d4da;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .logo-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .brand-block { display: flex; flex-direction: column; line-height: 1.05; }
+
+    .site-title {
+      color: #fff;
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+    }
+
+    .site-subtitle {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: #9fd0dc;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 25px;
+    }
+
+    nav ul li a {
+      color: #b8d4da;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: 500;
+      transition: color 0.3s ease, border-bottom 0.3s ease;
+      padding: 8px 4px;
+      border-bottom: 2px solid transparent;
+    }
+
+    nav ul li a:hover {
+      color: #fff;
+      border-bottom: 2px solid #b8d4da;
+    }
+
+    /* ── עיצוב כללי למדורים ── */
+    section {
+      padding: 100px 0 60px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .section-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: #145060;
+      margin-bottom: 10px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      right: 0;
+      width: 50px;
+      height: 4px;
+      background-color: var(--accent-blue);
+      border-radius: 2px;
+    }
+
+    .section-subtitle {
+      font-size: 16px;
+      color: var(--accent-light);
+      margin-bottom: 40px;
+      font-weight: 500;
+    }
+
+    /* שם הצוות מודגש */
+    .brand-name {
+      font-weight: 900;
+      background: linear-gradient(90deg, #1e5068 0%, #4a8fa8 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: #2e7090;
+    }
+    .brand-name.on-dark {
+      background: none;
+      -webkit-text-fill-color: #d6eef5;
+      color: #d6eef5;
+    }
+
+    /* ── מדור מסך הבית ואודות האפליקציה ── */
+    #home {
+      padding-top: 130px;
+    }
+
+    .hero-flex {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      margin-bottom: 50px;
+    }
+
+    .hero-text {
+      flex: 1.2;
+    }
+
+    .project-badge-container {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .project-badge {
+      background: rgba(30, 80, 104, 0.12);
+      border: 1px solid var(--accent-blue);
+      color: #1e4a60;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .project-badge.badge-team {
+      background: linear-gradient(135deg, #1e5068 0%, #2e7090 100%);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 3px 10px rgba(30,80,104,0.25);
+    }
+
+    .hero-text h2 {
+      font-size: 42px;
+      font-weight: 900;
+      color: #1e5068;
+      line-height: 1.18;
+      margin-bottom: 18px;
+    }
+
+    .hero-text h2 .accent-vr {
+      color: var(--accent-blue);
+      white-space: nowrap;
+    }
+
+    .nowrap { white-space: nowrap; }
+
+    .hero-quote {
+      font-size: 18px;
+      font-style: italic;
+      color: #1e4558;
+      border-right: 4px solid var(--accent-blue);
+      padding-right: 15px;
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .hero-description {
+      font-size: 16px;
+      margin-bottom: 25px;
+      text-align: justify;
+    }
+
+    /* תמונת צוות קבוצתית */
+    .team-main-photo-wrapper {
+      flex: 1;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      height: 360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 18px 40px rgba(20,70,100,0.18);
+      transition: all 0.35s ease;
+    }
+
+    .team-main-photo-wrapper::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      box-shadow: inset 0 0 60px rgba(46,112,144,0.12);
+      pointer-events: none;
+    }
+
+    .team-main-photo-wrapper:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 24px 50px rgba(20,70,100,0.25);
+    }
+
+    .team-main-photo-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: radial-gradient(circle at center, #ffffff 0%, #eef6f8 100%);
+    }
+
+    /* גריד פיצ'רים מרכזיים */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+      margin-top: 40px;
+    }
+
+    .feature-card {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 22px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      box-shadow: 0 4px 15px rgba(20,60,80,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 14px 28px rgba(20,60,80,0.12);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(46,112,144,0.12), rgba(74,143,168,0.18));
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .feature-icon .icon { width: 26px; height: 26px; }
+
+    .feature-info h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e3a48;
+      margin-bottom: 5px;
+    }
+
+    .feature-info p {
+      font-size: 13px;
+      color: #2e5a6a;
+    }
+
+    /* טיימליין תהליך ארבעת הספרינטים */
+    .sprints-timeline-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1e5068;
+      margin: 60px 0 30px 0;
+      text-align: center;
+    }
+
+    .sprints-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .sprint-card {
+      background: rgba(255, 255, 255, 0.8);
+      border: 1px solid rgba(46, 112, 144, 0.2);
+      border-radius: 10px;
+      padding: 15px;
+      box-shadow: 0 3px 10px rgba(20,60,80,0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .sprint-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 22px rgba(20,60,80,0.12);
+    }
+
+    .sprint-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(46, 112, 144, 0.15);
+      padding-bottom: 8px;
+    }
+
+    .sprint-number {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #1e5068;
+      color: #b8d4da;
+      font-size: 14px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .sprint-title-text h5 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e3a48;
+    }
+
+    .sprint-title-text span {
+      font-size: 11px;
+      color: var(--accent-light);
+    }
+
+    .sprint-bullets {
+      list-style: none;
+    }
+
+    .sprint-bullets li {
+      font-size: 12px;
+      color: #1e4050;
+      padding: 3px 0;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .sprint-bullets li::before {
+      content: '✓';
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    /* ── מדור אודות הצוות ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 20px;
+    }
+
+    .member-card {
+      background: linear-gradient(160deg, #1c4a62 0%, #163a50 100%);
+      border: 1px solid rgba(140, 180, 190, 0.25);
+      border-radius: 14px;
+      padding: 25px 15px;
+      text-align: center;
+      color: #fff;
+      box-shadow: 0 6px 20px rgba(20, 60, 80, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .member-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 30px rgba(20, 60, 80, 0.3);
+    }
+
+    .member-avatar-wrapper {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 3px solid rgba(140, 180, 190, 0.5);
+      margin: 0 auto 15px auto;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+    }
+
+    .member-avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+
+    .member-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .member-role {
+      display: inline-block;
+      background: rgba(74, 143, 168, 0.3);
+      border: 1px solid rgba(140, 180, 190, 0.3);
+      color: #b8d4da;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 12px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+    }
+
+    .member-bio {
+      font-size: 13px;
+      color: rgba(184, 212, 218, 0.85);
+      line-height: 1.5;
+    }
+
+    /* ── מדור גלריית תמונות ── */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .gallery-item {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(20,60,80,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 14px 28px rgba(20,60,80,0.15);
+    }
+
+    .image-placeholder {
+      width: 100%;
+      height: 200px;
+      background: #dce7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .image-placeholder img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .gallery-item:hover .image-placeholder img { transform: scale(1.05); }
+
+    .image-placeholder .zoom-hint {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20,50,65,0.0);
+      color: #fff;
+      opacity: 0;
+      transition: opacity 0.3s ease, background 0.3s ease;
+    }
+    .gallery-item:hover .zoom-hint { opacity: 1; background: rgba(20,50,65,0.35); }
+    .zoom-hint .icon { width: 34px; height: 34px; }
+
+    .gallery-sprint-tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(20, 70, 100, 0.85);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 12px;
+      z-index: 2;
+    }
+
+    .gallery-caption {
+      padding: 15px;
+    }
+
+    .gallery-caption h4 {
+      font-size: 16px;
+      color: #1e3a48;
+      margin-bottom: 5px;
+    }
+
+    .gallery-caption p {
+      font-size: 13px;
+      color: #557a8a;
+    }
+
+    /* ── מדור סרטונים ── */
+    .videos-group-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e5068;
+      margin: 35px 0 18px 0;
+      padding-right: 12px;
+      border-right: 4px solid var(--accent-blue);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .videos-group-title .icon { width: 22px; height: 22px; color: var(--accent-blue); }
+
+    .video-feature {
+      background: linear-gradient(135deg, #1e5068 0%, #163a50 100%);
+      border-radius: 16px;
+      padding: 8px;
+      box-shadow: 0 14px 34px rgba(20,60,80,0.25);
+      margin-bottom: 10px;
+    }
+    .video-feature .video-container { border-radius: 12px; overflow: hidden; }
+    .video-feature .video-card-info { color: #eaf4f7; padding: 14px 16px 8px; }
+    .video-feature .video-card-info h4 { color: #fff; font-size: 18px; }
+    .video-feature .video-card-info p { color: rgba(220,238,243,0.85); }
+
+    .videos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 25px;
+    }
+
+    @media (max-width: 500px) {
+      .videos-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .video-card {
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(20,60,80,0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .video-card:hover { transform: translateY(-4px); box-shadow: 0 14px 28px rgba(20,60,80,0.14); }
+
+    .video-container {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .video-container video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #000;
+    }
+
+    .video-card-info {
+      padding: 15px 20px;
+    }
+
+    .video-card-info h4 {
+      font-size: 16px;
+      color: #1e3a48;
+      margin-bottom: 5px;
+    }
+
+    .video-card-info p {
+      font-size: 13px;
+      color: #557a8a;
+    }
+
+    .video-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+    }
+    .badge-demo { background: rgba(46,112,144,0.15); color: #1e5068; border: 1px solid var(--accent-blue); }
+    .badge-team { background: rgba(74,143,168,0.15); color: #2e6a82; border: 1px solid var(--accent-light); }
+    .badge-final { background: rgba(255,255,255,0.18); color: #fff; border: 1px solid rgba(255,255,255,0.4); }
+
+    /* ── מדור מצגות ומסמכים ── */
+    .docs-group-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e5068;
+      margin: 40px 0 18px 0;
+      padding-right: 12px;
+      border-right: 4px solid var(--accent-blue);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .docs-group-title .gnum {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: #1e5068; color: #b8d4da;
+      font-size: 13px; font-weight: 900;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .docs-group-title .gnum .icon { width: 15px; height: 15px; color: #b8d4da; }
+
+    .presentations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 20px;
+    }
+
+    .presentation-card {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 180px;
+      box-shadow: 0 4px 15px rgba(20,60,80,0.05);
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .presentation-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(20,60,80,0.13);
+    }
+
+    .pres-header h4 {
+      font-size: 17px;
+      color: #145060;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .pres-header h4 .icon { width: 20px; height: 20px; color: var(--accent-blue); }
+
+    .pres-header p {
+      font-size: 13px;
+      color: #4a6d7c;
+      margin-bottom: 18px;
+    }
+
+    .doc-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-download, .btn-view {
+      background: linear-gradient(135deg, #1e5068 0%, #145060 100%);
+      color: white;
+      text-decoration: none;
+      padding: 9px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border: 1px solid rgba(140,180,190,0.2);
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+    .btn-download .icon, .btn-view .icon { width: 16px; height: 16px; }
+
+    .btn-view {
+      background: transparent;
+      color: #145060;
+      border: 1.5px solid var(--accent-blue);
+    }
+
+    .btn-download:hover { background: #163f50; transform: translateY(-2px); }
+    .btn-view:hover { background: rgba(46,112,144,0.1); transform: translateY(-2px); }
+
+    /* ── Lightbox להגדלת תמונות גלריה ── */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 30, 40, 0.92);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 30px;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox img {
+      max-width: 92%;
+      max-height: 88%;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      left: 30px;
+      color: #fff;
+      font-size: 40px;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1;
+    }
+    .lightbox-caption {
+      position: absolute;
+      bottom: 25px;
+      left: 0; right: 0;
+      text-align: center;
+      color: #d4e6ec;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    /* ── אנימציית חשיפה בגלילה ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { opacity: 1; transform: none; transition: none; }
+    }
+
+    /* ── פוטר האתר ── */
+    footer {
+      background: linear-gradient(135deg, #1e5068 0%, #145060 100%);
+      color: rgba(184, 212, 218, 0.8);
+      padding: 25px 0;
+      border-top: 2px solid rgba(140, 180, 190, 0.2);
+      font-size: 14px;
+    }
+
+    .footer-flex {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+  
+    /* ── נגן YouTube קליל (תמונת פתיחה + כפתור) ── */
+    .yt-lite { position:relative; width:100%; height:100%; background-size:cover; background-position:center; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .yt-lite::before { content:''; position:absolute; inset:0; background:rgba(20,50,65,0.12); transition:background .3s ease; }
+    .yt-lite:hover::before { background:rgba(20,50,65,0.30); }
+    .yt-play { position:relative; z-index:1; width:70px; height:50px; border-radius:14px; background:rgba(20,70,100,0.88); display:flex; align-items:center; justify-content:center; transition:transform .2s ease, background .2s ease; box-shadow:0 4px 14px rgba(0,0,0,0.3); }
+    .yt-lite:hover .yt-play { transform:scale(1.12); background:#1e5068; }
+    .yt-play::after { content:''; border-style:solid; border-width:11px 0 11px 18px; border-color:transparent transparent transparent #fff; margin-left:4px; }
+    .video-container iframe { width:100%; height:100%; border:0; display:block; }
+
+  </style>
+</head>
+<body>
+
+  <!-- ════════ מאגר אייקונים (SVG) - מונוכרום אחיד ════════ -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-goggles" viewBox="0 0 24 24"><rect x="2" y="6.5" width="20" height="11" rx="3.5"/><path d="M12 6.5v11"/><path d="M5.5 11h2M16.5 11h2"/></symbol>
+      <symbol id="i-cpu" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></symbol>
+      <symbol id="i-medical" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M12 8v8M8 12h8"/></symbol>
+      <symbol id="i-cube" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7 12 12l8.7-5"/><path d="M12 22V12"/></symbol>
+      <symbol id="i-hand" viewBox="0 0 24 24"><path d="M18 11V6.5a1.5 1.5 0 0 0-3 0M15 10.5V5a1.5 1.5 0 0 0-3 0v5M12 10V6a1.5 1.5 0 0 0-3 0v8"/><path d="M9 11.5 7.6 9.9a1.6 1.6 0 0 0-2.4 2.1l2.9 4.2C9.2 18.6 10.6 20 13 20a6 6 0 0 0 6-6v-3.5a1.5 1.5 0 0 0-3 0V12"/></symbol>
+      <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></symbol>
+      <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><rect x="7" y="11" width="3" height="6"/><rect x="12.5" y="7" width="3" height="10"/><rect x="18" y="13" width="3" height="4"/></symbol>
+      <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.8"/><path d="M21 15l-5-5L5 21"/></symbol>
+      <symbol id="i-film" viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"/><path d="M7 3v18M17 3v18M2 8h5M17 8h5M2 16h5M17 16h5M2 12h20"/></symbol>
+      <symbol id="i-clipboard" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M8 11h8M8 15h6"/></symbol>
+      <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 8a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-8V3"/><path d="M7 14h10"/></symbol>
+      <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 2 2 7l10 5 10-5-10-5Z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/></symbol>
+      <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2Z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7Z"/></symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.5 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></symbol>
+      <symbol id="i-filetext" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M16 13H8M16 17H8M10 9H8"/></symbol>
+      <symbol id="i-message" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+      <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.1 8.3 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 8.9 8.3 12 2"/></symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><path d="M12 15V3"/></symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 4 20 12 6 20 6 4"/></symbol>
+      <symbol id="i-zoom" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/></symbol>
+    </defs>
+  </svg>
+
+  <!-- תפריט ניווט עליון קבוע -->
+  <header>
+    <div class="container nav-container">
+      <div class="logo-area">
+        <div class="logo-placeholder">
+          <img src="images/logo.png" alt="לוגו MedMeet">
+        </div>
+        <div class="brand-block">
+          <span class="site-title">MedMeet</span>
+          <span class="site-subtitle">BEST TEAM</span>
+        </div>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#home">בית ואודות</a></li>
+          <li><a href="#team">הצוות שלנו</a></li>
+          <li><a href="#gallery">תמונות פרויקט</a></li>
+          <li><a href="#videos">סרטונים</a></li>
+          <li><a href="#presentations">מצגות ומסמכים</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- מדור בית ואודות האפליקציה -->
+    <section id="home">
+      <div class="hero-flex">
+        <div class="hero-text">
+          <div class="project-badge-container">
+            <span class="project-badge badge-team">צוות Best Team</span>
+            <span class="project-badge">פרויקט גמר 2025-2026</span>
+            <span class="project-badge">המכללה האקדמית כנרת</span>
+          </div>
+          <h2>פלטפורמת פגישות רפואיות<br><span class="accent-vr">ב-AR ו-VR</span></h2>
+          <div class="hero-quote">
+            "אנו מאמינים כי עתיד הרפואה אינו נמצא בחדר ההמתנה, אלא במציאות המדומה."
+          </div>
+          <p class="hero-description">
+            MedMeet מגדירה מחדש את עולם הייעוץ הרפואי מרחוק. במקום שיחת וידאו דו-ממדית שטוחה, רופאים ומטופלים נפגשים בסביבת VR סוחפת לחלוטין: אישית, מקצועית ונוכחת. הפלטפורמה מציעה סטנדרט חדש המשלב בין טכנולוגיה רפואית מתקדמת לבין צרכים קליניים אמיתיים.
+          </p>
+        </div>
+
+        <!-- תיבת תמונת צוות מרכזית -->
+        <div class="team-main-photo-wrapper">
+          <img src="images/team_group.png" alt="צוות MedMeet - Best Team">
+        </div>
+      </div>
+
+      <!-- פיצ'רים של המערכת -->
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><svg class="icon"><use href="#i-goggles"/></svg></div>
+          <div class="feature-info">
+            <h4>סביבת VR/AR עשירה</h4>
+            <p>חדר דיונים קבוצתי אינטראקטיבי המאפשר עבודה סימולטנית של עד 5 משתתפים על גבי משקפי Meta Quest.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg class="icon"><use href="#i-cpu"/></svg></div>
+          <div class="feature-info">
+            <h4>תמלול וניתוח AI</h4>
+            <p>תמלול אוטומטי של המפגש בזמן אמת, זיהוי דוברים חכם (Diarization) והפקת דוחות מקיפים ב-PDF.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg class="icon"><use href="#i-medical"/></svg></div>
+          <div class="feature-info">
+            <h4>חדרי סימולציה רפואית</h4>
+            <p>חדרי הדרכה ייעודיים לניתוחי לב, ריאות ומוח, המלווים באנימציות שלבים ומדריכים אינטראקטיביים.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg class="icon"><use href="#i-cube"/></svg></div>
+          <div class="feature-info">
+            <h4>אנטומיה בתלת-ממד</h4>
+            <p>מודל גוף אנושי שלם המאפשר פירוק, בחינת איברים מקרוב וסנכרון תצוגה מלא בין כלל המשתתפים.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg class="icon"><use href="#i-hand"/></svg></div>
+          <div class="feature-info">
+            <h4>מערכת שפת סימנים</h4>
+            <p>אוואטר מתורגמן מבוסס בינה מלאכותית המתרגם דיבור חי לאנימציית שפת סימנים רפואית בעברית ובאנגלית.</p>
+          </div>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg class="icon"><use href="#i-leaf"/></svg></div>
+          <div class="feature-info">
+            <h4>אימפקט חברתי וסביבתי</h4>
+            <p>חדר תצוגה המציג נתוני חיסכון בפליטת פחמן (CO₂), נגישות רב-לשונית ומדדי קיימות קליניים.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- סיכום 4 הספרינטים מהפוסטר ומסמך הסיכום -->
+      <h3 class="sprints-timeline-title">אבני דרך: סיכום 4 הספרינטים של הפרויקט</h3>
+      <div class="sprints-grid">
+        <div class="sprint-card">
+          <div class="sprint-card-header">
+            <div class="sprint-number">1</div>
+            <div class="sprint-title-text">
+              <h5>ספרינט 1: התשתית</h5>
+              <span>אוקטובר-דצמבר 2025</span>
+            </div>
+          </div>
+          <ul class="sprint-bullets">
+            <li>חדר מפגש בסיסי ב-VR</li>
+            <li>ייצוג משתתפים באוואטרים</li>
+            <li>מערכת שמע ותקשורת VoIP</li>
+            <li>מודל תלת-ממדי משותף ומסונכרן</li>
+          </ul>
+        </div>
+
+        <div class="sprint-card">
+          <div class="sprint-card-header">
+            <div class="sprint-number">2</div>
+            <div class="sprint-title-text">
+              <h5>ספרינט 2: פיצ'רים מתקדמים</h5>
+              <span>דצמבר 2025-ינואר 2026</span>
+            </div>
+          </div>
+          <ul class="sprint-bullets">
+            <li>ניווט רב-חדרי אינטראקטיבי</li>
+            <li>כלי סימון ולייזר ייחודי לכל משתמש</li>
+            <li>תמלול ישיבות בעזרת בינה מלאכותית</li>
+            <li>מערכת הקלטת תנועה ואוואטרים בתוך Unity</li>
+          </ul>
+        </div>
+
+        <div class="sprint-card">
+          <div class="sprint-card-header">
+            <div class="sprint-number">3</div>
+            <div class="sprint-title-text">
+              <h5>ספרינט 3: הדרכות וחדשנות</h5>
+              <span>מרץ-יוני 2026</span>
+            </div>
+          </div>
+          <ul class="sprint-bullets">
+            <li>חדרי ניתוח לימודיים (לב, ריאה, מוח)</li>
+            <li>עוזר חכם רפואי (AI Assistant) מבוסס קול</li>
+            <li>מערכת שפת סימנים אינטראקטיבית</li>
+            <li>סימולציית חיתוך בית חזה ובדיקות רפואיות</li>
+          </ul>
+        </div>
+
+        <div class="sprint-card">
+          <div class="sprint-card-header">
+            <div class="sprint-number">4</div>
+            <div class="sprint-title-text">
+              <h5>ספרינט 4: חדר אנטומיה וליטוש</h5>
+              <span>יוני 2026</span>
+            </div>
+          </div>
+          <ul class="sprint-bullets">
+            <li>חדר אנטומיה: מודל גוף האדם אינטראקטיבי</li>
+            <li>פירוק איברים, הגדלה וקריאת מידע רפואי</li>
+            <li>שדרוג מלא של ה-UI וחוויית המשתמש</li>
+            <li>ייצוב פונקציונליות וסגירת באגים להגנה</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- מדור אודות הצוות -->
+    <section id="team">
+      <h3 class="section-title">האנשים שמאחורי MedMeet</h3>
+      <p class="section-subtitle">חברת <span class="brand-name">Best Team</span> | המכללה האקדמית כנרת</p>
+
+      <div class="team-grid">
+        <!-- חבר צוות 1 -->
+        <div class="member-card">
+          <div class="member-avatar-wrapper">
+            <img src="images/lidor.png" alt="לידור בן סימון">
+          </div>
+          <h4 class="member-name">לידור בן סימון</h4>
+          <span class="member-role">Product Owner</span>
+          <p class="member-bio">הגדיר את החזון וסדרי העדיפויות של הפרויקט, תוך הבטחה שכל תכונה ותכונה במערכת מעניקה ערך קליני ומעשי ממשי לרופאים ולמטופלים.</p>
+        </div>
+
+        <!-- חבר צוות 2 -->
+        <div class="member-card">
+          <div class="member-avatar-wrapper">
+            <img src="images/david.png" alt="דוד רן כהן">
+          </div>
+          <h4 class="member-name">דוד רן כהן</h4>
+          <span class="member-role">Scrum Master</span>
+          <p class="member-bio">ניהל וסנכרן את עבודת הפיתוח הדינמית לאורך כלל הספרינטים, שמר על קצב פיתוח מיטבי והפך כל אבן דרך לשלב בטוח בדרך למוצר יציב.</p>
+        </div>
+
+        <!-- חבר צוות 3 -->
+        <div class="member-card">
+          <div class="member-avatar-wrapper">
+            <img src="images/libar.png" alt="ליבר וייצמן">
+          </div>
+          <h4 class="member-name">ליבר וייצמן</h4>
+          <span class="member-role">Architect</span>
+          <p class="member-bio">תכנן ובנה את עמוד השדרה הטכנולוגי של יישומי ה-VR/AR, ואיפשר סנכרון רשת מורכב ואינטראקציות רפואיות מתקדמות בצורה חלקה ואינטואיטיבית.</p>
+        </div>
+
+        <!-- חבר צוות 4 -->
+        <div class="member-card">
+          <div class="member-avatar-wrapper">
+            <img src="images/rotem.png" alt="רותם סויסה">
+          </div>
+          <h4 class="member-name">רותם סויסה</h4>
+          <span class="member-role">Quality Owner</span>
+          <p class="member-bio">ניהל את מערך בדיקות התוכנה ואיכות המוצר, ווידא שכל פיצ'ר עומד בסטנדרטים המחמירים ביותר על מנת שרופאים ומטופלים יוכלו לסמוך על הפלטפורמה.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- מדור גלריית תמונות מהספרינטים -->
+    <section id="gallery">
+      <h3 class="section-title">גלריית תמונות מתוך המערכת</h3>
+      <p class="section-subtitle">צילומי מסך אמיתיים מתוך סרטוני ההדגמה | לחצו על תמונה להגדלה</p>
+
+      <div class="gallery-grid">
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 1</span>
+            <img src="images/gallery/01_vr_meeting_room.jpg" alt="חדר המפגש הווירטואלי">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>חדר המפגש הווירטואלי</h4>
+            <p>סביבת העבודה המשותפת וסנכרון האוואטרים בזמן אמת.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 2</span>
+            <img src="images/gallery/02_multiroom.jpg" alt="מערכת ריבוי חדרים">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>מערכת ריבוי חדרים והתחברות</h4>
+            <p>ניווט בין חדרי המפגש השונים ומסך התחברות משופר.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 2</span>
+            <img src="images/gallery/03_model3d.jpg" alt="אינטראקציה עם מודל תלת-ממד">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>אינטראקציה עם מודל תלת-ממד</h4>
+            <p>סיבוב, סימון ופירוק של מודלים אנטומיים משותפים.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 2</span>
+            <img src="images/gallery/04_image_display.jpg" alt="ניתוח נתונים ותצוגת דימות">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>ניתוח AI ותצוגת דימות רפואי</h4>
+            <p>הצגת נתוני משתתפים, תמלול והפקת דוחות מהמפגש.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 2</span>
+            <img src="images/gallery/05_recording.jpg" alt="מערכת הקלטה מתקדמת">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>מערכת הקלטה מתקדמת</h4>
+            <p>הקלטת המפגש המלא והפעלתו מחדש לצורכי לימוד ובקרה.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 3</span>
+            <img src="images/gallery/06_procedure_sim.jpg" alt="סימולציות פרוצדורות רפואיות">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>סימולציות פרוצדורות רפואיות</h4>
+            <p>תרגול בדיקות ופעולות רפואיות בסיסיות על מטופל וירטואלי.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 3</span>
+            <img src="images/gallery/07_heart_model.jpg" alt="מודל לב תלת-ממדי">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>מודל לב וחדרי הדרכה</h4>
+            <p>חדרי סימולציה רפואית עם מודלים תלת-ממדיים של איברי הגוף.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 3</span>
+            <img src="images/gallery/08_avatar_sync.jpg" alt="סנכרון תנועת אוואטרים">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>סנכרון תנועת אוואטרים</h4>
+            <p>תנועות ידיים וגוף מסונכרנות בין כל המשתתפים בזמן אמת.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 3</span>
+            <img src="images/gallery/09_ai_assistant.jpg" alt="עוזר רפואי חכם">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>עוזר רפואי חכם (AI)</h4>
+            <p>עוזר קולי מבוסס בינה מלאכותית למענה על שאלות רפואיות.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 3</span>
+            <img src="images/gallery/10_sign_language.jpg" alt="מערכת שפת סימנים">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>מערכת שפת סימנים נגישה</h4>
+            <p>תרגום דיבור לאנימציית שפת סימנים לנגישות מלאה.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 4</span>
+            <img src="images/gallery/11_anatomy_body.jpg" alt="חדר אנטומיה - מודל גוף האדם">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>חדר אנטומיה - מודל גוף האדם</h4>
+            <p>מודל תלת-ממדי מלא של גוף האדם, הניתן לניווט ולבחינה מקרוב.</p>
+          </div>
+        </div>
+
+        <div class="gallery-item">
+          <div class="image-placeholder" onclick="openLightbox(this)">
+            <span class="gallery-sprint-tag">ספרינט 4</span>
+            <img src="images/gallery/12_anatomy_organs.jpg" alt="פירוק איברים וקריאת מידע אנטומי">
+            <span class="zoom-hint"><svg class="icon"><use href="#i-zoom"/></svg></span>
+          </div>
+          <div class="gallery-caption">
+            <h4>פירוק איברים וקריאת מידע</h4>
+            <p>לחיצה על איברי הגוף (ריאות, מוח, ראש ועוד) מאפשרת לפרק, להגדיל ולקרוא מידע רפואי רלוונטי.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- מדור סרטוני הפרויקט -->
+    <section id="videos">
+      <h3 class="section-title">סרטוני הדגמה ופרזנטציות</h3>
+      <p class="section-subtitle">קטעי וידאו המתעדים את פעילות המערכת והתקדמות הצוות לאורך הספרינטים</p>
+
+      <h4 class="videos-group-title"><svg class="icon"><use href="#i-star"/></svg> מצגת הסיום המוקלטת (עם קריינות ושמע)</h4>
+      <div class="video-feature">
+        <div class="video-container">
+          <div class="yt-lite" data-yt="-t6DOURNQpc" style="background-image:url('images/final_presentation_cover.jpg')" role="button" tabindex="0" onclick="playYT(this)" onkeypress="if(event.key==='Enter')playYT(this)"><span class="yt-play"></span></div>
+        </div>
+        <div class="video-card-info">
+          <span class="video-badge badge-final">מצגת סיום</span>
+          <h4>MedMeet VR &amp; AR - מצגת הסיום המלאה</h4>
+          <p>הקלטת מצגת הסיום של הפרויקט, כולל קריינות קולית ומעבר אוטומטי בין השקופיות.</p>
+        </div>
+      </div>
+
+      <h4 class="videos-group-title"><svg class="icon"><use href="#i-cube"/></svg> סרטון התוצר המלא - כל הספרינטים (כולל ספרינט 4)</h4>
+      <div class="video-feature">
+        <div class="video-container">
+          <div class="yt-lite" data-drive="1IuEvoPd1t5B97J_mWDs7arIcqONgAj6G" style="background-image:url('images/posters/FullVideo.jpg')" role="button" tabindex="0" onclick="playYT(this)" onkeypress="if(event.key==='Enter')playYT(this)"><span class="yt-play"></span></div>
+        </div>
+        <div class="video-card-info">
+          <span class="video-badge badge-final">המערכת המלאה</span>
+          <h4>סיור מלא בכלל מערכת MedMeet</h4>
+          <p>סרטון ההדגמה המקיף של כל יכולות המערכת מארבעת הספרינטים, כולל חדר האנטומיה החדש (מודל גוף האדם, פירוק איברים וקריאת מידע רפואי) ושיפורי ה-UI והפונקציונליות של ספרינט 4.</p>
+        </div>
+      </div>
+
+      <h4 class="videos-group-title"><svg class="icon"><use href="#i-play"/></svg> סרטון קונספט - הרעיון מאחורי MedMeet</h4>
+      <div class="videos-grid">
+        <div class="video-card">
+          <div class="video-container">
+            <div class="yt-lite" data-yt="4cutTWwfo1k" style="background-image:url('images/posters/Concept.jpg')" role="button" tabindex="0" onclick="playYT(this)" onkeypress="if(event.key==='Enter')playYT(this)"><span class="yt-play"></span></div>
+          </div>
+          <div class="video-card-info">
+            <span class="video-badge badge-demo">קונספט</span>
+            <h4>חזון הפלטפורמה</h4>
+            <p>סרטון המסביר את הרעיון: חיבור רופאים ומטופלים בסביבה וירטואלית במקום חדר המתנה פיזי.</p>
+          </div>
+        </div>
+      </div>
+
+      <h4 class="videos-group-title"><svg class="icon"><use href="#i-film"/></svg> ספרינט 1 - התשתית</h4>
+      <div class="videos-grid">
+        <div class="video-card">
+          <div class="video-container">
+            <div class="yt-lite" data-yt="h4MHVOUbn4M" style="background-image:url('images/posters/Sprint1_Demo.jpg')" role="button" tabindex="0" onclick="playYT(this)" onkeypress="if(event.key==='Enter')playYT(this)"><span class="yt-play"></span></div>
+          </div>
+          <div class="video-card-info">
+            <span class="video-badge badge-demo">דמו</span>
+            <h4>סרטון דמו במשקפי מציאות מדומה</h4>
+            <p>הדגמת חדר המפגש הבסיסי, האוואטרים ומערכת השמע בתוך סביבת ה-VR.</p>
+          </div>
+        </div>
+        <div class="video-card">
+          <div class="video-container">
+            <div class="yt-lite" data-yt="lQYcWi3Z6bU" style="background-image:url('images/posters/Sprint1_Team.jpg')" role="button" tabindex="0" onclick="playYT(this)" onkeypress="if(event.key==='Enter')playYT(this)"><span class="yt-play"></span></div>
+          </div>
+          <div class="video-card-info">
+            <span class="video-badge badge-team">היבט קבוצתי</span>
+            <h4>סרטון בהיבט קבוצתי - צוות מס' 2</h4>
+            <p>סקירת עבודת הצוות, חלוקת התפקידים והתהליך לאורך ספרינט 1.</p>
+          </div>
+        </div>
+      </div>
+
+      <h4 class="videos-group-title"><svg class="icon"><use href="#i-film"/></svg> ספרינט 2 - פיצ'רים מתקדמים</h4>
+      <div class="videos-grid">
+        <div class="video-card">
+          <div class="video-container">
+            <div class="yt-lite" data-yt="J1rStz2sKM8" style="background-image:url('images/posters/Sprint2_Demo.jpg')" role="button" tabindex="0" onclick="playYT(this)" onkeypress="if(event.key==='Enter')playYT(this)"><span class="yt-play"></span></div>
+          </div>
+          <div class="video-card-info">
+            <span class="video-badge badge-demo">דמו</span>
+            <h4>סרטון דמו - ספרינט 2</h4>
+            <p>ניווט רב-חדרי, אינטראקציה עם מודלים תלת-ממדיים, תמלול AI ומערכת הקלטה.</p>
+          </div>
+        </div>
+        <div class="video-card">
+          <div class="video-container">
+            <div class="yt-lite" data-yt="tYcdo_RlBAA" style="background-image:url('images/posters/Sprint2_Team.jpg')" role="button" tabindex="0" onclick="playYT(this)" onkeypress="if(event.key==='Enter')playYT(this)"><span class="yt-play"></span></div>
+          </div>
+          <div class="video-card-info">
+            <span class="video-badge badge-team">היבט קבוצתי</span>
+            <h4>סרטון קבוצתי - ספרינט 2</h4>
+            <p>סיכום עבודת הצוות וההתקדמות במהלך ספרינט 2 של הפרויקט.</p>
+          </div>
+        </div>
+      </div>
+
+      <h4 class="videos-group-title"><svg class="icon"><use href="#i-film"/></svg> ספרינט 3 - הדרכות וחדשנות</h4>
+      <div class="videos-grid">
+        <div class="video-card">
+          <div class="video-container">
+            <div class="yt-lite" data-yt="mahmEmatYCE" style="background-image:url('images/posters/Sprint3_Demo.jpg')" role="button" tabindex="0" onclick="playYT(this)" onkeypress="if(event.key==='Enter')playYT(this)"><span class="yt-play"></span></div>
+          </div>
+          <div class="video-card-info">
+            <span class="video-badge badge-demo">דמו</span>
+            <h4>סרטון דמו - ספרינט 3</h4>
+            <p>חדרי סימולציה רפואית, עוזר AI חכם, מערכת שפת סימנים וסימולציות פרוצדורות.</p>
+          </div>
+        </div>
+        <div class="video-card">
+          <div class="video-container">
+            <div class="yt-lite" data-yt="_eq6-wgwZGw" style="background-image:url('images/posters/Sprint3_Team.jpg')" role="button" tabindex="0" onclick="playYT(this)" onkeypress="if(event.key==='Enter')playYT(this)"><span class="yt-play"></span></div>
+          </div>
+          <div class="video-card-info">
+            <span class="video-badge badge-team">היבט קבוצתי</span>
+            <h4>סרטון קבוצתי - ספרינט 3</h4>
+            <p>סקירת תהליך העבודה והחידושים שפיתח הצוות במהלך ספרינט 3.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- מדור מצגות ומסמכים -->
+    <section id="presentations">
+      <h3 class="section-title">מצגות ומסמכים רשמיים</h3>
+      <p class="section-subtitle">כלל תיעוד הפרויקט לפי ספרינטים | לכל מסמך אפשרות להצגה במסך מלא או הורדה</p>
+
+      <!-- מסמכי סיכום ראשיים -->
+      <h4 class="docs-group-title"><span class="gnum"><svg class="icon"><use href="#i-star"/></svg></span> מסמכי סיכום ראשיים</h4>
+      <div class="presentations-grid">
+        <div class="presentation-card">
+          <div class="pres-header">
+            <h4><svg class="icon"><use href="#i-chart"/></svg> מצגת MedMeet המלאה</h4>
+            <p>המצגת הרשמית הכוללת את חזון המוצר, הארכיטקטורה, החלוקה לספרינטים ותוצאות הפיתוח.</p>
+          </div>
+          <div class="doc-actions">
+            <a href="presentations/MedMeet_Final.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/MedMeet_Final.pdf" download="מצגת MedMeet המלאה.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header">
+            <h4><svg class="icon"><use href="#i-image"/></svg> פוסטר הפרויקט (עברית)</h4>
+            <p>הפוסטר הרשמי של הפרויקט המסכם את כל יכולות המערכת והאימפקט שלה בעמוד אחד.</p>
+          </div>
+          <div class="doc-actions">
+            <a href="presentations/s4_2_poster_he.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s4_2_poster_he.pdf" download="פוסטר MedMeet בעברית.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header">
+            <h4><svg class="icon"><use href="#i-film"/></svg> פוסטר אינטראקטיבי + PPTX</h4>
+            <p>הפוסטר האינטראקטיבי לצפייה בדפדפן, וכן קובץ המצגת המקורי (PowerPoint) להורדה.</p>
+          </div>
+          <div class="doc-actions">
+            <a href="presentations/s4_3_poster.html" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג פוסטר</a>
+            <a href="presentations/s4_1_final_presentation.pptx" download="MedMeet מצגת סיום.pptx" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד PPTX</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header">
+            <h4><svg class="icon"><use href="#i-filetext"/></svg> מסמך סיכום הפרויקט המלא</h4>
+            <p>סיכום מקיף של כל יכולות המערכת מארבעת הספרינטים, כולל חדר האנטומיה, הטכנולוגיות והאימפקט.</p>
+          </div>
+          <div class="doc-actions">
+            <a href="presentations/project_full_summary.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/project_full_summary.pdf" download="מסמך סיכום הפרויקט המלא - MedMeet.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header">
+            <h4><svg class="icon"><use href="#i-message"/></svg> סיכומים אישיים - הצוות</h4>
+            <p>מילים אישיות מכל חברי צוות Best Team על הפרויקט, החוויה והדרך המשותפת.</p>
+          </div>
+          <div class="doc-actions">
+            <a href="presentations/team_personal_summaries.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/team_personal_summaries.pdf" download="סיכומים אישיים - צוות Best Team.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ספרינט 1 -->
+      <h4 class="docs-group-title"><span class="gnum">1</span> ספרינט 1 - התשתית</h4>
+      <div class="presentations-grid">
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-clipboard"/></svg> Backlog</h4><p>רשימת המשימות והדרישות שתוכננו לספרינט 1.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s1_1_backlog.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s1_1_backlog.pdf" download="Backlog - ספרינט 1.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-flask"/></svg> מסמך תכנית בדיקות</h4><p>תכנית הבדיקות (Test Plan) של ספרינט 1.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s1_2_test_plan.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s1_2_test_plan.pdf" download="תכנית בדיקות - ספרינט 1.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-layers"/></svg> מסמך ארכיטקטורה</h4><p>תיאור הארכיטקטורה הטכנולוגית של המערכת בספרינט 1.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s1_3_architecture.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s1_3_architecture.pdf" download="ארכיטקטורה - ספרינט 1.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-book"/></svg> מדריך למשתמש</h4><p>מדריך הפעלה ושימוש במערכת עבור המשתמש.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s1_4_user_manual.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s1_4_user_manual.pdf" download="מדריך למשתמש - ספרינט 1.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-refresh"/></svg> רטרוספקטיבה</h4><p>הפקת לקחים וסיכום תהליך העבודה בספרינט 1.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s1_5_retrospective.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s1_5_retrospective.pdf" download="רטרוספקטיבה - ספרינט 1.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-chart"/></svg> מצגת MVP</h4><p>מצגת הצגת תוצרי ה-MVP של ספרינט 1.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s1_6_mvp_presentation.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s1_6_mvp_presentation.pdf" download="מצגת MVP - ספרינט 1.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-filetext"/></svg> מסמך סיכום</h4><p>מסמך סיכום כולל של ספרינט 1.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s1_7_summary.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s1_7_summary.pdf" download="סיכום - ספרינט 1.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ספרינט 2 -->
+      <h4 class="docs-group-title"><span class="gnum">2</span> ספרינט 2 - פיצ'רים מתקדמים</h4>
+      <div class="presentations-grid">
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-clipboard"/></svg> Backlog</h4><p>רשימת המשימות והדרישות שתוכננו לספרינט 2.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s2_1_backlog.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s2_1_backlog.pdf" download="Backlog - ספרינט 2.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-flask"/></svg> מסמך תכנית בדיקות</h4><p>תכנית הבדיקות (Test Plan) של ספרינט 2.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s2_2_test_plan.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s2_2_test_plan.pdf" download="תכנית בדיקות - ספרינט 2.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-layers"/></svg> מסמך ארכיטקטורה</h4><p>תיאור הארכיטקטורה הטכנולוגית של המערכת בספרינט 2.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s2_3_architecture.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s2_3_architecture.pdf" download="ארכיטקטורה - ספרינט 2.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-book"/></svg> מדריך למשתמש</h4><p>מדריך הפעלה ושימוש במערכת עבור המשתמש.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s2_4_user_manual.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s2_4_user_manual.pdf" download="מדריך למשתמש - ספרינט 2.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-refresh"/></svg> רטרוספקטיבה</h4><p>הפקת לקחים וסיכום תהליך העבודה בספרינט 2.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s2_5_retrospective.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s2_5_retrospective.pdf" download="רטרוספקטיבה - ספרינט 2.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-chart"/></svg> מצגת MVP</h4><p>מצגת הצגת תוצרי ה-MVP של ספרינט 2.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s2_6_mvp_presentation.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s2_6_mvp_presentation.pdf" download="מצגת MVP - ספרינט 2.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-filetext"/></svg> מסמך סיכום</h4><p>מסמך סיכום הצוות של ספרינט 2.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s2_7_summary.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s2_7_summary.pdf" download="סיכום - ספרינט 2.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ספרינט 3 -->
+      <h4 class="docs-group-title"><span class="gnum">3</span> ספרינט 3 - הדרכות וחדשנות</h4>
+      <div class="presentations-grid">
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-clipboard"/></svg> Backlog</h4><p>רשימת המשימות והדרישות שתוכננו לספרינט 3.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s3_1_backlog.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s3_1_backlog.pdf" download="Backlog - ספרינט 3.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-flask"/></svg> מסמך תכנית בדיקות</h4><p>תכנית הבדיקות (Test Plan) של ספרינט 3.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s3_2_test_plan.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s3_2_test_plan.pdf" download="תכנית בדיקות - ספרינט 3.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-layers"/></svg> מסמך ארכיטקטורה</h4><p>תיאור הארכיטקטורה הטכנולוגית של המערכת בספרינט 3.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s3_3_architecture.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s3_3_architecture.pdf" download="ארכיטקטורה - ספרינט 3.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-book"/></svg> מדריך למשתמש</h4><p>מדריך הפעלה ושימוש במערכת עבור המשתמש.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s3_4_user_manual.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s3_4_user_manual.pdf" download="מדריך למשתמש - ספרינט 3.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-refresh"/></svg> רטרוספקטיבה</h4><p>הפקת לקחים וסיכום תהליך העבודה בספרינט 3.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s3_5_retrospective.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s3_5_retrospective.pdf" download="רטרוספקטיבה - ספרינט 3.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-chart"/></svg> מצגת ספרינט 3</h4><p>מצגת הצגת תוצרי ספרינט 3.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s3_6_presentation.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s3_6_presentation.pdf" download="מצגת - ספרינט 3.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-message"/></svg> סיכום פגישה (אופיר)</h4><p>סיכום פגישת ליווי עם המנחה אופיר בספרינט 3.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s3_7_meeting_summary.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s3_7_meeting_summary.pdf" download="סיכום פגישה אופיר - ספרינט 3.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+        <div class="presentation-card">
+          <div class="pres-header"><h4><svg class="icon"><use href="#i-filetext"/></svg> מסמך סיכום</h4><p>מסמך סיכום כולל של ספרינט 3.</p></div>
+          <div class="doc-actions">
+            <a href="presentations/s3_8_summary.pdf" target="_blank" class="btn-view"><svg class="icon"><use href="#i-eye"/></svg> הצג</a>
+            <a href="presentations/s3_8_summary.pdf" download="סיכום - ספרינט 3.pdf" class="btn-download"><svg class="icon"><use href="#i-download"/></svg> הורד</a>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <!-- חלון Lightbox להגדלת תמונות -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img id="lightbox-img" alt="">
+    <div class="lightbox-caption" id="lightbox-caption"></div>
+  </div>
+
+  <!-- פוטר האתר -->
+  <footer>
+    <div class="container footer-flex">
+      <p>© 2026 MedMeet | פותח על ידי סטודנטים מהמכללה האקדמית כנרת</p>
+      <p>חברת <span class="brand-name on-dark">Best Team</span></p>
+    </div>
+  </footer>
+
+  <script>
+    function openLightbox(el) {
+      var img = el.querySelector('img');
+      var caption = el.parentElement.querySelector('.gallery-caption h4');
+      var lb = document.getElementById('lightbox-img');
+      lb.src = img.src;
+      lb.alt = img.alt;
+      document.getElementById('lightbox-caption').textContent = caption ? caption.textContent : '';
+      document.getElementById('lightbox').classList.add('open');
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+    }
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    /* אנימציית חשיפה הדרגתית בגלילה */
+    (function() {
+      var targets = document.querySelectorAll('.feature-card, .sprint-card, .member-card, .gallery-item, .video-card, .video-feature, .presentation-card');
+      targets.forEach(function(t) { t.classList.add('reveal'); });
+      if (!('IntersectionObserver' in window)) {
+        targets.forEach(function(t) { t.classList.add('visible'); });
+        return;
+      }
+      var io = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      targets.forEach(function(t) { io.observe(t); });
+    })();
+  </script>
+
+
+  <script>
+    function playYT(el){
+      var drive = el.getAttribute('data-drive');
+      var id = el.getAttribute('data-yt');
+      var ifr = document.createElement('iframe');
+      if(drive){
+        ifr.setAttribute('src','https://drive.google.com/file/d/'+drive+'/preview');
+        ifr.setAttribute('allow','autoplay; fullscreen');
+      } else {
+        if(!id || id.indexOf('YT_') === 0){
+          alert('הסרטון יעלה בקרוב — טרם חובר קישור הסרטון שלו.');
+          return;
+        }
+        ifr.setAttribute('src','https://www.youtube.com/embed/'+id+'?autoplay=1&rel=0');
+        ifr.setAttribute('allow','accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+      }
+      ifr.setAttribute('title','MedMeet video');
+      ifr.setAttribute('frameborder','0');
+      ifr.setAttribute('allowfullscreen','');
+      el.replaceWith(ifr);
+    }
+  </script>
+
+</body>
+</html>
